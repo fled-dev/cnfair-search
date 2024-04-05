@@ -64,7 +64,7 @@ class Main:
                 response = requests.get(full_url, headers=headers)
 
                 # If not 200 or 404
-                if response.status_code != 200 and response.status_code != 404:
+                if response.status_code not in (200, 404):
                     Main.warning('Error: Invalid response')
                     break
                 elif response.status_code == 404:

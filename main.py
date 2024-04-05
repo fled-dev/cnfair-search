@@ -1,6 +1,5 @@
 import requests
 import pyfiglet
-import sys
 import time
 import os
 import random
@@ -38,7 +37,7 @@ class CNFS:
                 requests.get('https://bing.com')
             except requests.ConnectionError:
                 print(colored('Error: No internet connection', 'red'))
-                sys.exit()
+                exit()
 
     def cnfair_look(self):
         base_url = "https://cnfair.com/gateway/mall/ep/item/list"
@@ -133,8 +132,13 @@ class CNFS:
                         print(colored('Price: ', 'green') + colored(str(price), 'white'))
                         print('---')
                         print(colored('Exchange Code: ', 'red') + colored(str(exchange_code), 'white'))
+                        print(colored('URL: ', 'red') + colored(f'https://cnfair.com/detail/{item_id}', 'white'))
                         print()
                         print()
+
+                        # Append to a file
+                        with open(self.query + '.txt', 'a') as f:
+                            f.write(f'Title: {title}\nItem ID: {item_id}\nGoods Attr: {goods_attr}\nSeller: {seller} | Source: {store_source}\nPrice: {price}\nExchange Code: {exchange_code}\nURL: https://cnfair.com/detail/{item_id}\n\n')
 
                 if not products:
                     break

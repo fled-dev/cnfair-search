@@ -10,7 +10,8 @@ WARNINGS = True
 
 # Main class
 class Main:
-    def welcome(self):
+    @staticmethod
+    def welcome():
         os.system('cls' if os.name == 'nt' else 'clear')
         ascii_logo = pyfiglet.figlet_format("CNFS v1.0")
         print(ascii_logo)
@@ -24,7 +25,8 @@ class Main:
         if WARNINGS is True:
             print(colored(message, 'yellow'))
 
-    def is_online(self):
+    @staticmethod
+    def is_online():
         try:
             requests.get('https://google.com')
             Main.log("Success: Internet connection is available", 'green')
@@ -108,7 +110,8 @@ class Main:
 
                 current_page += 1
 
-    def search(self):
+    @staticmethod
+    def search():
         print()
         query = input('\033[1mWhat phrase do you want to search for?\033[0m ' + colored('>> ', 'green'))
         print()

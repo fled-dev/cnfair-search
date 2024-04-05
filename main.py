@@ -34,7 +34,6 @@ class Main:
     def cnfair_look(query):
         base_url = "https://cnfair.com/gateway/mall/ep/item/list"
         current_page = 1
-        total_products = 0
 
         # User agents list
         user_agents = [

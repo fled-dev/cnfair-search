@@ -1,5 +1,6 @@
 import requests
 import pyfiglet
+import sys
 import time
 import os
 import random
@@ -37,7 +38,7 @@ class CNFS:
                 requests.get('https://bing.com')
             except requests.ConnectionError:
                 print(colored('Error: No internet connection', 'red'))
-                exit()
+                sys.exit()
 
     def cnfair_look(self):
         base_url = "https://cnfair.com/gateway/mall/ep/item/list"

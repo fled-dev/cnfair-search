@@ -1,13 +1,9 @@
 import requests
 import pyfiglet
 import time
-import socket
-import json
 import os
 import random
-from bs4 import BeautifulSoup
 from termcolor import colored
-from selenium import webdriver
 
 DEBUG = True
 WARNINGS = True

@@ -5,11 +5,14 @@ import os
 import random
 from termcolor import colored
 
-DEBUG = True
-WARNINGS = True
 
 # Main class
-class Main:
+class CNFS:
+    def __init__(self, debug=True, warnings=True):
+        self.debug = debug
+        self.warnings = warnings
+
+
     @staticmethod
     def welcome():
         os.system('cls' if os.name == 'nt' else 'clear')
@@ -17,23 +20,26 @@ class Main:
         print(ascii_logo)
         time.sleep(1)
 
-    def log(message, color):
-        if DEBUG is True:
+    def log(self, message, color):
+        if self.debug is True:
             print(colored(message, color))
 
-    def warning(message):
-        if WARNINGS is True:
+    def warning(self, message):
+        if self.warnings is True:
             print(colored(message, 'yellow'))
 
     @staticmethod
     def is_online():
         try:
             requests.get('https://google.com')
-            Main.log("Success: Internet connection is available", 'green')
         except requests.ConnectionError:
-            print(colored("Error: No internet connection", 'red'))
+            try:
+                requests.get('https://bing.com')
+            except requests.ConnectionError:
+                print(colored('Error: No internet connection', 'red'))
+                exit()
 
-    def cnfair_look(query):
+    def cnfair_look(self):
         base_url = "https://cnfair.com/gateway/mall/ep/item/list"
         current_page = 1
 
@@ -48,11 +54,28 @@ class Main:
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15'
         ]
 
-        # Bypass security checks
-        headers = {'User-Agent': random.choice(user_agents),}
+        # DNT headers list
+        dnt_headers = ['0', '1']
+
+        # Keep-alive headers list
+        keep_alive_headers = ['keep-alive', 'close']
+
+        # Upgrade-Insecure-Requests headers list
+        uir_headers = ['0', '1']
 
         while True:
             current_page = 1
+
+            headers = {
+                'User-Agent': random.choice(user_agents),
+                'Accept': '*/*',  # Accept all content types
+                'Accept-Language': 'en-US,en;q=0.9, *;q=0.8',  # Accept English, then any language
+                'Accept-Encoding': 'gzip, deflate, br',
+                'DNT': random.choice(dnt_headers), 
+                'Connection': random.choice(keep_alive_headers),
+                'Upgrade-Insecure-Requests': random.choice(uir_headers),
+                'Priority': 'u=1, i'
+            }
 
             while True:
                 params = {
@@ -63,27 +86,34 @@ class Main:
 
                 full_url = base_url + '?' + '&'.join([f"{key}={value}" for key, value in params.items()])
                 response = requests.get(full_url, headers=headers)
+                time.sleep(random.uniform(0.22, 0.97))  # Random delay to avoid rate limiting and simulate human behavior
 
                 # If not 200 or 404
                 if response.status_code not in (200, 404):
-                    Main.warning('Error: Invalid response')
+                    CNFS.warning('Error: Invalid response')
                     break
                 elif response.status_code == 404:
-                    Main.warning('Success: No more products found')
+                    CNFS.warning('Success: No more products found')
                     break
 
                 # Parse JSON
                 product_data = response.json()
                 products = product_data.get('rows', [])
                 
+                # Create a list of the product's specifications (variable unpacking)
                 for product in products:
-                    title = product.get('goodsName', '')
-                    item_id = product.get('itemNo', '')
-                    goods_attr = product.get('goodsAttr', '')
-                    seller = product.get('storeName', '')
-                    store_source = product.get('storeSource', '')
-                    price = product.get('points', '')
-                    exchange_code = product.get('exchangeCode', '')
+                    title, item_id, goods_attr, seller, store_source_raw, price, exchange_code = (
+                        product.get(key, '') for key in 
+                        ('goodsName', 'itemNo', 'goodsAttr', 'storeName', 'storeSource', 'points', 'exchangeCode')
+                    )
+
+                    # Convert store source to reader-friendly format (dictionary mapping)
+                    store_mapping = {
+                        'wd': 'Weidian',
+                        'taobao': 'Taobao',
+                        'alibaba': 'Alibaba'
+                    }
+                    store_source = store_mapping.get(store_source_raw, store_source_raw)
 
                     # Convert attributes to string (assuming it might be a list or dictionary)
                     if isinstance(goods_attr, dict):
@@ -93,7 +123,7 @@ class Main:
 
                     search_fields = [title, seller, goods_attr]
 
-                    if any(query.lower() in field.lower() for field in search_fields):
+                    if any(self.query.lower() in field.lower() for field in search_fields):
                         print(colored('Title: ', 'green') + colored(str(title), 'white'))
                         print(colored('Item ID: ', 'green') + colored(str(item_id), 'white'))
                         print(colored('Goods Attr: ', 'green') + colored(str(goods_attr), 'white'))
@@ -110,16 +140,16 @@ class Main:
 
                 current_page += 1
 
-    @staticmethod
-    def search():
+    def search(self):
         print()
         query = input('\033[1mWhat phrase do you want to search for?\033[0m ' + colored('>> ', 'green'))
+        self.query = query
         print()
-        Main.cnfair_look(query)
+        CNFS.cnfair_look(self)
 
 
 if __name__ == '__main__':
-    main = Main()
-    main.welcome()
-    main.is_online()
-    main.search()
+    cnfs = CNFS()
+    cnfs.welcome()
+    cnfs.is_online()
+    cnfs.search()

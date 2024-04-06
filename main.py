@@ -43,37 +43,26 @@ class CNFS:
         base_url = "https://cnfair.com/gateway/mall/ep/item/list"
         current_page = 1
 
-        # User agents list
-        user_agents = [
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36'
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15'
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 13_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.1 Safari/605.1.15'
-        ]
-
-        # DNT headers list
-        dnt_headers = ['0', '1']
-
-        # Keep-alive headers list
-        keep_alive_headers = ['keep-alive', 'close']
-
-        # Upgrade-Insecure-Requests headers list
-        uir_headers = ['0', '1']
-
         while True:
             current_page = 1
 
             headers = {
-                'User-Agent': random.choice(user_agents),
-                'Accept': '*/*',  # Accept all content types
-                'Accept-Language': 'en-US,en;q=0.9, *;q=0.8',  # Accept English, then any language
-                'Accept-Encoding': 'gzip, deflate, br',
-                'DNT': random.choice(dnt_headers), 
-                'Connection': random.choice(keep_alive_headers),
-                'Upgrade-Insecure-Requests': random.choice(uir_headers),
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Mobile Safari/537.36',
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'en-US,en;q=0.9',
+                'Lang': 'en',
+                'Currency': 'CNY', 
+                'Accept-Encoding': 'gzip, deflate, br, zstd',
+                'DNT': '1',
+                'Host': 'cnfair.com',
+                'Referer': 'https://cnfair.com/home',
+                'Sec-Ch-Ua': '"Chromium";v="123", "Not:A-Brand";v="8"',
+                'Sec-Ch-Ua-Mobile': '?1',
+                'Sec-Ch-Ua-Platform': 'Android',
+                'Sec-Fetch-Dest': 'empty',
+                'Sec-Fetch-Mode': 'cors',
+                'Sec-Fetch-Site': 'same-origin',
+                'Connection': 'keep-alive',
                 'Priority': 'u=1, i'
             }
 
@@ -102,9 +91,9 @@ class CNFS:
                 
                 # Create a list of the product's specifications (variable unpacking)
                 for product in products:
-                    title, item_id, goods_attr, seller, store_source_raw, price, exchange_code = (
+                    title, item_id, goods_attr, seller, seller_id ,store_source_raw, price, exchange_code = (
                         product.get(key, '') for key in 
-                        ('goodsName', 'itemNo', 'goodsAttr', 'storeName', 'storeSource', 'points', 'exchangeCode')
+                        ('goodsName', 'itemNo', 'goodsAttr', 'storeName', 'storeId', 'storeSource', 'points', 'exchangeCode')
                     )
 
                     # Convert store source to reader-friendly format (dictionary mapping)
@@ -119,7 +108,7 @@ class CNFS:
                     if isinstance(goods_attr, dict):
                         goods_attr = ' '.join(goods_attr.values())  # Adjust if needed
                     elif isinstance(goods_attr, list):
-                        goods_attr = ' '.join(goods_attr) 
+                        goods_attr = ' '.join(goods_attr)
 
                     search_fields = [title, seller, goods_attr]
 
@@ -128,7 +117,7 @@ class CNFS:
                         print(colored('Item ID: ', 'green') + colored(str(item_id), 'white'))
                         print(colored('Goods Attr: ', 'green') + colored(str(goods_attr), 'white'))
                         print('---')
-                        print(colored('Seller: ', 'green') + colored(str(seller), 'white') + colored(' | Source: ', 'green') + colored(str(store_source), 'white'))
+                        print(colored('Seller: ', 'green') + colored(str(seller) + f' ({seller_id})', 'white') + colored(' | Source: ', 'green') + colored(str(store_source), 'white'))
                         print(colored('Price: ', 'green') + colored(str(price), 'white'))
                         print('---')
                         print(colored('Exchange Code: ', 'red') + colored(str(exchange_code), 'white'))
